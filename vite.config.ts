@@ -31,6 +31,21 @@ export default defineConfig({
       },
     ],
   },
-  server: { port: PORT, host: true },
+  server: {
+    port: PORT,
+    host: true,
+    headers: {
+      // Allow eval() needed by Vite dev-mode source maps
+      'Content-Security-Policy': "script-src 'self' 'unsafe-eval' 'unsafe-inline'; default-src 'self' 'unsafe-inline' data: https: wss:;",
+    },
+    proxy: {
+      // Proxy CoinGecko API to bypass CORS in dev
+      '/api/coingecko': {
+        target: 'https://api.coingecko.com',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/api\/coingecko/, ''),
+      },
+    },
+  },
   preview: { port: PORT, host: true },
 });

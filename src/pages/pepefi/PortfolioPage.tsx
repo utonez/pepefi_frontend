@@ -122,7 +122,11 @@ export default function PortfolioPage() {
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
   const fetchAll = useCallback(async () => {
-    if (!contracts || !wallet.address) return
+    if (!contracts || !wallet.address) {
+      // Wallet not ready — clear loading so we don't freeze on skeleton
+      setIsLoaded(true)
+      return
+    }
     try {
       const addr = wallet.address
 
@@ -198,11 +202,11 @@ export default function PortfolioPage() {
 
       // ── C: Free margin ────────────────────────────────────────────────────
       setFreeMargin((await contracts.exchange.freeMargin(addr)) as bigint)
-
-      setIsLoaded(true)
     } catch (e) {
       console.error('[portfolio fetch]', e)
       notify(prettyError(e), false)
+    } finally {
+      setIsLoaded(true)
     }
   }, [contracts, wallet.address, notify])
 
@@ -213,11 +217,11 @@ export default function PortfolioPage() {
     return () => clearInterval(timer)
   }, [fetchAll])
 
-  // Clear loading when on an unsupported network
+  // Clear loading when wallet not connected or on wrong network
   const isWrongNetwork = wallet.isConnected && wallet.chainId !== null && !getAddresses(wallet.chainId)
   useEffect(() => {
-    if (isWrongNetwork) setIsLoaded(true)
-  }, [isWrongNetwork])
+    if (!wallet.isConnected || isWrongNetwork) setIsLoaded(true)
+  }, [wallet.isConnected, isWrongNetwork])
 
   // ── Transactions ────────────────────────────────────────────────────────────
   const doUnfollow = async (index: number) => {

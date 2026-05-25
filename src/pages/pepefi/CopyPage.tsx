@@ -137,7 +137,7 @@ export default function CopyPage() {
         ])
         const s = si as unknown as { amount: bigint; totalSlashed: bigint }
         setStakeData({ stake: s.amount, totalSlashed: s.totalSlashed, reputation: score as bigint })
-      } catch { /* not deployed */ }
+      } catch (e) { console.error('[copy fetchStake]', e) }
     }
     void go()
   }, [contracts, traderAddress])

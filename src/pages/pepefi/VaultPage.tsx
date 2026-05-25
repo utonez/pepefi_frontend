@@ -30,6 +30,7 @@ interface ActivityEntry {
 }
 
 const ZERO = 0n
+const ZERO_STATS: VaultStats = { totalAssets: ZERO, totalSupply: ZERO, sharePrice: ZERO, myShares: ZERO, myUsdcValue: ZERO }
 
 function f18(v: bigint, dec = 2): string {
   return Number(formatUnits(v, 18)).toLocaleString(undefined, {
@@ -94,7 +95,11 @@ export default function VaultPage() {
   }
 
   const fetchStats = useCallback(async () => {
-    if (!vault || !wallet.address) return
+    if (!vault || !wallet.address) {
+      // Contracts or wallet not ready — show zeros instead of spinning skeleton
+      setStats(ZERO_STATS)
+      return
+    }
     try {
       const [totalAssets, totalSupply, sharePrice, myShares] = await Promise.all([
         vault.totalAssets()    as Promise<bigint>,
@@ -106,7 +111,11 @@ export default function VaultPage() {
         ? myShares * totalAssets / totalSupply
         : ZERO
       setStats({ totalAssets, totalSupply, sharePrice, myShares, myUsdcValue })
-    } catch { /* not deployed */ }
+    } catch (e) {
+      console.error('[vault fetchStats]', e)
+      // Show zeros rather than leaving skeleton spinning
+      setStats(ZERO_STATS)
+    }
   }, [vault, wallet.address])
 
   useEffect(() => {

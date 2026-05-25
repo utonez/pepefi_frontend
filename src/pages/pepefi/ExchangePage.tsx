@@ -104,7 +104,11 @@ export default function ExchangePage() {
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
   const fetchAll = useCallback(async () => {
-    if (!contracts || !wallet.address || !wallet.provider) return
+    if (!contracts || !wallet.address || !wallet.provider) {
+      // Wallet not ready yet — don't leave skeleton spinning
+      setPageLoading(false)
+      return
+    }
     try {
       const [bal, mgn, eBal, reserve] = await Promise.all([
         contracts.usdc.balanceOf(wallet.address),
