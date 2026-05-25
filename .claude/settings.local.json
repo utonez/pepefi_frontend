@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(yarn lint *)",
+      "Bash(node -e \"const p=require\\('./node_modules/tailwindcss/package.json'\\);console.log\\(p.version\\)\")",
+      "Bash(yarn build *)",
+      "Bash(cd \"/c/Users/user/Desktop/Minimal_TypeScript_v7.5.0-gmoqrb/Minimal_TypeScript_v7.5.0/starter-vite-ts\" && grep '\"dev\"' package.json | head -3)"
+    ]
+  }
+}
